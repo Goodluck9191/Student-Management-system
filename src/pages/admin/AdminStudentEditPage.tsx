@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { StudentForm } from '../components/students/StudentForm'
-import { PageHeader } from '../components/ui/PageHeader'
-import { LoadingState, ErrorState } from '../components/ui/States'
-import { useStudents } from '../context/StudentsContext'
-import { useToast } from '../components/ui/Toast'
-import type { Student, StudentInput } from '../types/student'
-import { fullName } from '../lib/format'
+import { StudentForm } from '../../components/students/StudentForm'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { LoadingState, ErrorState } from '../../components/ui/States'
+import { useStudents } from '../../context/StudentsContext'
+import { useToast } from '../../components/ui/Toast'
+import type { Student, StudentInput } from '../../types/student'
+import { fullName } from '../../lib/format'
 
-export function EditStudentPage() {
+export function AdminStudentEditPage() {
   const { id } = useParams<{ id: string }>()
   const { getStudent, updateStudent } = useStudents()
   const { showToast } = useToast()
@@ -46,7 +46,7 @@ export function EditStudentPage() {
     try {
       const updated = await updateStudent(id, values)
       showToast(`${fullName(updated)} was updated successfully.`)
-      navigate(`/students/${id}`)
+      navigate(`/admin/students/${id}`)
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Failed to update student.', 'error')
       setIsSubmitting(false)

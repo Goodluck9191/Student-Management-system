@@ -17,7 +17,7 @@ interface StudentsContextValue {
   refresh: () => Promise<void>
   getStudent: (id: string) => Promise<Student>
   addStudent: (input: StudentInput) => Promise<Student>
-  updateStudent: (id: string, input: StudentInput) => Promise<Student>
+  updateStudent: (id: string, input: Partial<StudentInput>) => Promise<Student>
   deleteStudent: (id: string) => Promise<void>
   getNextAdmissionNumber: () => Promise<string>
 }
@@ -56,7 +56,7 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
     return created
   }, [])
 
-  const updateStudent = useCallback(async (id: string, input: StudentInput) => {
+  const updateStudent = useCallback(async (id: string, input: Partial<StudentInput>) => {
     const updated = await studentService.update(id, input)
     setStudents((prev) => prev.map((s) => (s.id === id ? updated : s)))
     return updated

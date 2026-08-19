@@ -8,10 +8,12 @@ import { GENDER_LABELS } from '../../lib/constants'
 
 interface StudentTableProps {
   students: Student[]
+  classNames: Record<string, string>
   onDelete: (student: Student) => void
+  basePath?: string
 }
 
-export function StudentTable({ students, onDelete }: StudentTableProps) {
+export function StudentTable({ students, classNames, onDelete, basePath = '/admin/students' }: StudentTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[720px] text-left text-sm">
@@ -41,10 +43,7 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
           {students.map((student) => (
             <tr key={student.id} className="transition-colors hover:bg-slate-50">
               <td className="px-5 py-3">
-                <Link
-                  to={`/students/${student.id}`}
-                  className="flex items-center gap-3"
-                >
+                <Link to={`${basePath}/${student.id}`} className="flex items-center gap-3">
                   <StudentAvatar student={student} size="sm" />
                   <span className="font-medium text-slate-900">{fullName(student)}</span>
                 </Link>
@@ -53,21 +52,21 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                 {student.admissionNumber}
               </td>
               <td className="px-5 py-3 text-slate-600">{GENDER_LABELS[student.gender]}</td>
-              <td className="px-5 py-3 text-slate-600">{student.className}</td>
+              <td className="px-5 py-3 text-slate-600">{classNames[student.classId] ?? '—'}</td>
               <td className="px-5 py-3">
                 <StatusBadge status={student.status} />
               </td>
               <td className="px-5 py-3">
                 <div className="flex items-center justify-end gap-1">
                   <Link
-                    to={`/students/${student.id}`}
+                    to={`${basePath}/${student.id}`}
                     aria-label={`View ${fullName(student)}`}
                     className="rounded-lg p-2 text-slate-400 hover:bg-brand-50 hover:text-brand-600"
                   >
                     <Eye className="h-4 w-4" />
                   </Link>
                   <Link
-                    to={`/students/${student.id}/edit`}
+                    to={`${basePath}/${student.id}/edit`}
                     aria-label={`Edit ${fullName(student)}`}
                     className="rounded-lg p-2 text-slate-400 hover:bg-brand-50 hover:text-brand-600"
                   >
