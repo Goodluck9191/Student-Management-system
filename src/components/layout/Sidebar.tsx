@@ -1,29 +1,49 @@
 import { NavLink } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  Users,
-  UserPlus,
-  Settings,
-  X,
-} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { LogOut, X } from 'lucide-react'
 import { SchoolLogo } from './SchoolLogo'
+import { NameAvatar } from '../ui/NameAvatar'
+import type { AuthUser } from '../../types/user'
+import { capitalize } from '../../lib/format'
 
-const navItems = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/students', label: 'Students', icon: Users, end: false },
-  { to: '/students/new', label: 'Add Student', icon: UserPlus, end: false },
-]
-
-const footerItems = [
-  { to: '/settings', label: 'Settings', icon: Settings, end: false },
-]
-
-interface SidebarProps {
-  open: boolean
-  onClose: () => void
+export interface NavItem {
+  to: string
+  label: string
+  icon: LucideIcon
+  end?: boolean
 }
 
-export function Sidebar({ open, onClose }: SidebarProps) {
+interface SidebarProps {
+  navItems: NavItem[]
+  footerItems?: NavItem[]
+  open: boolean
+  onClose: () => void
+  user: AuthUser
+  onLogout: () => void
+}
+
+function NavLinkItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+        ${
+          isActive
+            ? 'bg-brand-50 text-brand-700'
+            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+        }`
+      }
+    >
+      <item.icon className="h-5 w-5" aria-hidden="true" />
+      {item.label}
+    </NavLink>
+  )
+}
+
+export function Sidebar({ navItems, footerItems, open, onClose, user, onLogout }: SidebarProps) {
   return (
     <>
       {open && (
@@ -51,45 +71,34 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
-                ${
-                  isActive
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`
-              }
-            >
-              <item.icon className="h-5 w-5" aria-hidden="true" />
-              {item.label}
-            </NavLink>
+            <NavLinkItem key={item.to} item={item} onClose={onClose} />
           ))}
         </nav>
 
-        <div className="border-t border-slate-100 px-3 py-3">
-          {footerItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
-                ${
-                  isActive
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`
-              }
+        {footerItems && footerItems.length > 0 && (
+          <div className="border-t border-slate-100 px-3 py-3">
+            {footerItems.map((item) => (
+              <NavLinkItem key={item.to} item={item} onClose={onClose} />
+            ))}
+          </div>
+        )}
+
+        <div className="border-t border-slate-100 p-4">
+          <div className="flex items-center gap-3">
+            <NameAvatar name={user.name} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-900">{user.name}</p>
+              <p className="text-xs text-slate-500">{capitalize(user.role.toLowerCase())}</p>
+            </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              aria-label="Log out"
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
             >
-              <item.icon className="h-5 w-5" aria-hidden="true" />
-              {item.label}
-            </NavLink>
-          ))}
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </aside>
     </>

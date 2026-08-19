@@ -1,30 +1,37 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, SlidersHorizontal, UserPlus, X } from 'lucide-react'
-import { useStudents } from '../context/StudentsContext'
-import { StudentTable } from '../components/students/StudentTable'
-import { PageHeader } from '../components/ui/PageHeader'
-import { Card } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
-import { LoadingState, ErrorState } from '../components/ui/States'
-import { EmptyState } from '../components/ui/EmptyState'
-import { ConfirmDialog } from '../components/ui/ConfirmDialog'
-import { Pagination } from '../components/ui/Pagination'
-import { useToast } from '../components/ui/Toast'
-import type { Student } from '../types/student'
-import { CLASSES, STATUS_OPTIONS, PAGE_SIZE } from '../lib/constants'
-import { fullName } from '../lib/format'
+import { useStudents } from '../../context/StudentsContext'
+import { useClasses } from '../../context/ClassesContext'
+import { StudentTable } from '../../components/students/StudentTable'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Card } from '../../components/ui/Card'
+import { Button } from '../../components/ui/Button'
+import { LoadingState, ErrorState } from '../../components/ui/States'
+import { EmptyState } from '../../components/ui/EmptyState'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { Pagination } from '../../components/ui/Pagination'
+import { useToast } from '../../components/ui/Toast'
+import type { Student } from '../../types/student'
+import { STATUS_OPTIONS, PAGE_SIZE } from '../../lib/constants'
+import { fullName } from '../../lib/format'
 
-export function StudentsPage() {
+export function AdminStudentsPage() {
   const { students, loading, error, refresh, deleteStudent } = useStudents()
+  const { items: classes } = useClasses()
   const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
-  const [className, setClassName] = useState('')
+  const [classId, setClassId] = useState('')
   const [status, setStatus] = useState('')
   const [gender, setGender] = useState('')
   const [page, setPage] = useState(1)
   const [deleting, setDeleting] = useState<Student | null>(null)
+
+  const classNames = useMemo(
+    () => Object.fromEntries(classes.map((c) => [c.id, c.name])),
+    [classes],
+  )
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -33,22 +40,22 @@ export function StudentsPage() {
         term === '' ||
         fullName(student).toLowerCase().includes(term) ||
         student.admissionNumber.toLowerCase().includes(term)
-      const matchesClass = className === '' || student.className === className
+      const matchesClass = classId === '' || student.classId === classId
       const matchesStatus = status === '' || student.status === status
       const matchesGender = gender === '' || student.gender === gender
       return matchesSearch && matchesClass && matchesStatus && matchesGender
     })
-  }, [students, search, className, status, gender])
+  }, [students, search, classId, status, gender])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pageCount)
   const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
-  const hasFilters = search !== '' || className !== '' || status !== '' || gender !== ''
+  const hasFilters = search !== '' || classId !== '' || status !== '' || gender !== ''
 
   const clearFilters = () => {
     setSearch('')
-    setClassName('')
+    setClassId('')
     setStatus('')
     setGender('')
     setPage(1)
@@ -80,7 +87,7 @@ export function StudentsPage() {
         title="Students"
         subtitle="Manage all registered students"
         action={
-          <Link to="/students/new">
+          <Link to="/admin/students/create">
             <Button>
               <UserPlus className="h-4 w-4" aria-hidden="true" />
               Add Student
@@ -122,18 +129,18 @@ export function StudentsPage() {
             <div className="flex flex-wrap items-center gap-2">
               <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 lg:block" aria-hidden="true" />
               <select
-                value={className}
+                value={classId}
                 onChange={(e) => {
-                  setClassName(e.target.value)
+                  setClassId(e.target.value)
                   setPage(1)
                 }}
                 aria-label="Filter by class"
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
               >
                 <option value="">All classes</option>
-                {CLASSES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -184,7 +191,7 @@ export function StudentsPage() {
                   Clear filters
                 </Button>
               ) : (
-                <Link to="/students/new">
+                <Link to="/admin/students/create">
                   <Button>
                     <UserPlus className="h-4 w-4" aria-hidden="true" />
                     Add Student
@@ -195,7 +202,7 @@ export function StudentsPage() {
           />
         ) : (
           <>
-            <StudentTable students={pageItems} onDelete={setDeleting} />
+            <StudentTable students={pageItems} classNames={classNames} onDelete={setDeleting} />
             <div className="border-t border-slate-100">
               <Pagination
                 page={currentPage}
