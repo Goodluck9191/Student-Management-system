@@ -65,7 +65,14 @@ class MockResultRepository implements ResultRepository {
   }
 
   publish(id: string): Promise<Result> {
-    return this.transition(id)
+    return this.repository
+      .getById(id)
+      .then((result) => {
+        if (WORKFLOW[result.status] !== 'published') {
+          throw new Error(`Results in status "${result.status}" cannot be moved forward.`)
+        }
+        return this.repository.update(id, { status: 'published', publishedAt: new Date().toISOString() })
+      })
   }
 }
 

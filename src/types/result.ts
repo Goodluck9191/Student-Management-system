@@ -17,6 +17,8 @@ export interface Result {
   teacherComment: string
   status: ResultStatus
   teacherId: string
+  /** ISO timestamp recorded when the result was published. */
+  publishedAt?: string
 }
 
 export type ResultInput = Omit<Result, 'id'>
