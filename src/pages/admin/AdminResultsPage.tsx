@@ -1,4 +1,5 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Megaphone, Send } from 'lucide-react'
 import { useResults } from '../../context/ResultsContext'
 import { useStudents } from '../../context/StudentsContext'
@@ -22,12 +23,26 @@ export function AdminResultsPage() {
   const { items: subjects } = useSubjects()
   const { showToast } = useToast()
 
+  const [searchParams] = useSearchParams()
+  const statusParam = searchParams.get('status') ?? ''
+  const subjectParam = searchParams.get('subjectId') ?? ''
+
   const [studentId, setStudentId] = useState('')
-  const [subjectId, setSubjectId] = useState('')
+  const [subjectId, setSubjectId] = useState(subjectParam)
   const [term, setTerm] = useState('')
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState(statusParam)
   const [page, setPage] = useState(1)
   const [deleting, setDeleting] = useState<Result | null>(null)
+
+  useEffect(() => {
+    setStatus(statusParam)
+    setPage(1)
+  }, [statusParam])
+
+  useEffect(() => {
+    setSubjectId(subjectParam)
+    setPage(1)
+  }, [subjectParam])
 
   const studentNames = useMemo(() => toRecord(students), [students])
   const subjectNames = useMemo(() => toRecord(subjects), [subjects])

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, UserPlus, X } from 'lucide-react'
 import { useStudents } from '../../context/StudentsContext'
 import { useClasses } from '../../context/ClassesContext'
@@ -21,12 +21,20 @@ export function AdminStudentsPage() {
   const { items: classes } = useClasses()
   const { showToast } = useToast()
 
+  const [searchParams] = useSearchParams()
+  const statusParam = searchParams.get('status') ?? ''
+
   const [search, setSearch] = useState('')
   const [classId, setClassId] = useState('')
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState(statusParam)
   const [gender, setGender] = useState('')
   const [page, setPage] = useState(1)
   const [deleting, setDeleting] = useState<Student | null>(null)
+
+  useEffect(() => {
+    setStatus(statusParam)
+    setPage(1)
+  }, [statusParam])
 
   const classNames = useMemo(
     () => Object.fromEntries(classes.map((c) => [c.id, c.name])),
@@ -87,7 +95,7 @@ export function AdminStudentsPage() {
         title="Students"
         subtitle="Manage all registered students"
         action={
-          <Link to="/admin/students/create">
+          <Link to="/admin/students/new">
             <Button>
               <UserPlus className="h-4 w-4" aria-hidden="true" />
               Add Student
@@ -191,7 +199,7 @@ export function AdminStudentsPage() {
                   Clear filters
                 </Button>
               ) : (
-                <Link to="/admin/students/create">
+                <Link to="/admin/students/new">
                   <Button>
                     <UserPlus className="h-4 w-4" aria-hidden="true" />
                     Add Student

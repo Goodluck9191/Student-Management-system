@@ -27,6 +27,7 @@ import { AdminParentsPage } from './pages/admin/AdminParentsPage'
 import { AdminClassesPage } from './pages/admin/AdminClassesPage'
 import { AdminSubjectsPage } from './pages/admin/AdminSubjectsPage'
 import { AdminResultsPage } from './pages/admin/AdminResultsPage'
+import { AdminResultsAnalyticsPage } from './pages/admin/AdminResultsAnalyticsPage'
 import { AdminAnnouncementsPage } from './pages/admin/AdminAnnouncementsPage'
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage'
 import { TeacherDashboardPage } from './pages/teacher/TeacherDashboardPage'
@@ -97,6 +98,7 @@ function App() {
                                   <Route path="classes" element={<AdminClassesPage />} />
                                   <Route path="subjects" element={<AdminSubjectsPage />} />
                                   <Route path="results" element={<AdminResultsPage />} />
+                                  <Route path="results/analytics" element={<AdminResultsAnalyticsPage />} />
                                   <Route path="announcements" element={<AdminAnnouncementsPage />} />
                                   <Route path="notifications" element={<NotificationsPage />} />
                                   <Route path="settings" element={<AdminSettingsPage />} />
